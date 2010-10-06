@@ -42,3 +42,8 @@ class BoardTest(TestCase):
 
     def test_click_mine(self):
         self.failUnlessEqual(self.board.is_mined(0,0), True, 'There was no mine at 0,0')
+        self.failUnlessEqual(self.board.is_mined(1,0), False, 'There was no mine at 1,0')
+
+    def test_place_flag(self):
+        self.board.place_flag(0,0)
+        self.failUnlessEqual(self.board.flags_left(), TOTAL_MINES - 1, 'A flag was not placed')
