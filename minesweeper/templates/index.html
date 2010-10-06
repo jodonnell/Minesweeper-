@@ -1,65 +1,115 @@
 <HTML>
 <HEAD>
 <script type="text/javascript" src="http://jacobodonnell.com/js/jquery-1.4.2.min.js"></script>
+<style>
+.square {
+    width:25px;
+    height: 25px;
+    position:absolute;
+    background-color: grey;
+}
+</style>
+
 <script>
 
 var rows = {{ rows }};
 var columns = {{ columns }};
 
+
 var game_over = false;
 
 $(document).ready(function()
 {
+    var LEFT_MOUSE_CLICKED = 1;
+    var RIGHT_MOUSE_CLICKED = 3;
+
+    function is_flagged(element) {
+        return (element.style.backgroundColor == 'yellow')
+    }
+
+    function is_clear(element) {
+        return element.innerHTML != '';
+    }
+
+    function unflag(element) {
+        element.style.backgroundColor = 'grey';
+    }
+
+    function flag(element) {
+        element.style.backgroundColor = 'yellow';
+    }
+
+    function set_safe(clear_area) {
+        for (var i = 0; i < clear_area.length; i++) {
+            var clear_point = clear_area[i];
+            $('#row' + clear_point[0] + 'column' + clear_point[1]).css('background-color', 'green');
+        }
+    }
+
+    function lost(element) {
+        element.style.backgroundColor = 'red';
+        $('#lost').css('visibility', 'visible');
+        game_over = true;
+    }
+
+    function won() {
+        $('#win').css('visibility', 'visible');
+    }
+
+    function clear_spot(element) {
+        var args = {'row':element.getAttribute('rowNum'), 'column':element.getAttribute('columnNum')};
+        $.getJSON('/clear', args, function(data) {
+            if (data.lost == true) {
+                lost(element);
+            }
+
+            if (data.num_surronding_mines) {
+                element.innerHTML = data.num_surronding_mines;
+            }
+            
+            if (data.clear_area) {
+                set_safe(data.clear_area);
+            }
+        });
+    }
+
+    function flag_square(element) {
+        var args = {'row':element.getAttribute('rowNum'), 'column':element.getAttribute('columnNum')};
+        $.getJSON('/flag', args, function(data) {
+            if (is_flagged(element))
+                unflag(element);
+            else
+                flag(element);
+
+            if (data.won)
+                won();
+        });
+    }
+
     for (var row = 0; row < rows; row++) {
         var top = row * 30;
         for (var column = 0; column < columns; column++) {
-            var id = "row" + row + "column" + column;
             var left = column * 30;
 
-            var style = "background-color: grey; position:absolute; width: 25px; height: 25px; left:" + left + "px; top:" + top + "px;";
-            $("#game_area").append('<div my_row="'+ row+ '" my_column="'+ column+'" id="' + id + '" style="' + style + '"></div>');
+            var id = "row" + row + "column" + column;
+            var style = "left:" + left + "px; top:" + top + "px;";
+            $("#game_area").append('<div class="square" rowNum="' + row+ '" columnNum="' + column + '" id="' + id 
+                                   + '" style="' + style + '"></div>');
 
             $('#' + id).mousedown(function(event) {
 //                if (game_over == true)
 //                    return;
                 switch (event.which) {
-                case 1:
-                    if (this.style.backgroundColor == 'yellow')
+                case LEFT_MOUSE_CLICKED:
+                    if (is_flagged(this) || is_clear(this))
                         break;
-                    var _this = this;
-                    $.getJSON('/clear', {'row':this.getAttribute('my_row'), 'column':this.getAttribute('my_column')}, function(data) {
-
-                        if (data.lost == true) {
-                            _this.style.backgroundColor = 'red';
-                            game_over = true;
-                            $('#lost').css('visibility', 'visible');
-                        }
-
-                        if (data.num_surronding_mines) {
-                            _this.innerHTML = data.num_surronding_mines;
-                        }
-                        if (data.clear_area) {
-                            for (var i = 0; i < data.clear_area.length; i++) {
-                                var clear_point = data.clear_area[i];
-                                $('#row' + clear_point[0] + 'column' + clear_point[1]).css('background-color', 'green');
-                            }
-                        }
-
-                    });
+                    clear_spot(this);
                     break;
-                case 3:
-                    var _this = this;
-                    if (this.innerHTML != '')
+                case RIGHT_MOUSE_CLICKED:
+                    if (is_clear(this))
                         break;
 
-                    $.getJSON('/flag', {'row':this.getAttribute('my_row'), 'column':this.getAttribute('my_column')}, function(data) {
-                        if (_this.style.backgroundColor == 'yellow')
-                            _this.style.backgroundColor = 'grey';
-                        else
-                            _this.style.backgroundColor = 'yellow';
-                        if (data.won)
-                            $('#win').css('visibility', 'visible');
-                    });
+                    flag_square(this);
                     break;
                 default:
                     throw 'Your mouse is weird.';
@@ -68,7 +118,7 @@ $(document).ready(function()
         }
     }
 
-    $('div').bind("contextmenu", function(e){ return false; })
+    $('div').bind("contextmenu", function(e){ return false; }) // removes right click menu
 
     $('#reset').mousedown(function(event) {
         $.getJSON('/reset', function(data) {
