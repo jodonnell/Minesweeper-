@@ -60,3 +60,6 @@ class BoardTest(TestCase):
         for column in range(5, BOARD_COLUMNS):
             self.board.place_flag(1, column)
         self.failUnlessEqual(self.board.has_won(), True, 'The player should have won but did not')
+
+    def test_get_num_surronding_mines(self):
+        self.failUnlessEqual(self.board.get_num_surronding_mines(2, 4), 1, 'There should be one bordering mine at 2,4')
