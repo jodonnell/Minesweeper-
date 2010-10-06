@@ -62,4 +62,11 @@ class BoardTest(TestCase):
         self.failUnlessEqual(self.board.has_won(), True, 'The player should have won but did not')
 
     def test_get_num_surronding_mines(self):
-        self.failUnlessEqual(self.board.get_num_surronding_mines(2, 4), 1, 'There should be one bordering mine at 2,4')
+        mines_surronding = self.board.get_num_surronding_mines(2, 4)
+        self.failUnlessEqual(mines_surronding, 1, 'There should be one bordering mine at 2,4 found: ' + str(mines_surronding))
+
+        mines_surronding = self.board.get_num_surronding_mines(1, 0)
+        self.failUnlessEqual(mines_surronding, 2, 'There should be two bordering mines at 1,0 found: ' + str(mines_surronding))
+
+        mines_surronding = self.board.get_num_surronding_mines(7, 7)
+        self.failUnlessEqual(mines_surronding, 0, 'There should be zero bordering mines at 7,7 found: ' + str(mines_surronding))
