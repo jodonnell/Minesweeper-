@@ -31,14 +31,14 @@ class CreateTestBoardTest(TestCase):
         self.failUnlessEqual(create_test_board.get_board(), self.get_test_board())
 
     def get_test_board(self):
-        return [[1, 1, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0],
+        return [[1, 1, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]]
 
 
 class BoardTest(TestCase):
     def setUp(self):
         create_test_board = CreateTestBoard(BOARD_ROWS, BOARD_COLUMNS, TOTAL_MINES)
-        self.board = Board(create_test_board.get_board())
+        self.board = Board(create_test_board)
 
     def test_click_mine(self):
         self.failUnlessEqual(self.board.is_mined(0,0), True, 'There was no mine at 0,0')
@@ -47,3 +47,16 @@ class BoardTest(TestCase):
     def test_place_flag(self):
         self.board.place_flag(0,0)
         self.failUnlessEqual(self.board.flags_left(), TOTAL_MINES - 1, 'A flag was not placed')
+
+        self.board.place_flag(0,0)
+        self.failUnlessEqual(self.board.flags_left(), TOTAL_MINES - 1, 'A flag was set on top of a flag')
+
+    def test_win(self):
+        for column in range(BOARD_COLUMNS - 1):
+            self.board.place_flag(0, column)
+
+        self.failUnlessEqual(self.board.has_won(), False, 'The player should not have won')
+
+        for column in range(5, BOARD_COLUMNS):
+            self.board.place_flag(1, column)
+        self.failUnlessEqual(self.board.has_won(), True, 'The player should have won but did not')
