@@ -42,6 +42,15 @@ class Board:
 
     def get_num_surronding_mines(self, row, column):
         num_mines = 0
+
+        for point in self._get_surronding_spots(row, column):
+            if self._board[point[0]][point[1]] == MINED_SPOT:
+                num_mines += 1
+
+        return num_mines
+
+    def _get_surronding_spots(self, row, column):
+        surronding_spots = []
         for test_row in range(row - 1, row + 2):
             for test_column in range(column - 1, column + 2):
                 if test_row == row and test_column == column:
@@ -51,9 +60,23 @@ class Board:
                     continue
 
                 try:
-                    if self._board[test_row][test_column] == MINED_SPOT:
-                        num_mines += 1
+                    self._board[test_row][test_column]
                 except IndexError:
                     continue
+                
+                surronding_spots.append((test_row, test_column))
 
-        return num_mines
+        return surronding_spots
+
+    def get_clear_area(self, row, column, clear_area):
+        "You should initially pass in [] to clear_area, it will recursively build"
+        if self.get_num_surronding_mines(row, column) > 0:
+            return clear_area
+
+        clear_area.append((row, column))
+        for point in self._get_surronding_spots(row, column):
+            if point not in clear_area:
+                clear_area = self.get_clear_area(point[0], point[1], clear_area)
+
+        return clear_area
+

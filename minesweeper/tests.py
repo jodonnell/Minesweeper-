@@ -70,3 +70,7 @@ class BoardTest(TestCase):
 
         mines_surronding = self.board.get_num_surronding_mines(7, 7)
         self.failUnlessEqual(mines_surronding, 0, 'There should be zero bordering mines at 7,7 found: ' + str(mines_surronding))
+
+    def test_get_clear_area(self):
+        clear_area = self.board.get_clear_area(7,7, [])
+        self.failUnlessEqual(len(clear_area), 44)
