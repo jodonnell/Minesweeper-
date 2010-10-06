@@ -79,4 +79,3 @@ class Board:
                 clear_area = self.get_clear_area(point[0], point[1], clear_area)
 
         return clear_area
-

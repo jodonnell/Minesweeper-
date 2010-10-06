@@ -1,16 +1,11 @@
 <HTML>
 <HEAD>
 <script type="text/javascript" src="http://jacobodonnell.com/js/jquery-1.4.2.min.js"></script>
-<script>
-$(document).ready(function()
-{
-var div = $('<div/>');
-
-});
-</script>
 </HEAD>
 <BODY>
-Hi.
-{{papa}}
+<form action="/" method="post">
+{{ form.as_p }}
+<input type="submit" value="Submit" />
+</form>
 </BODY>
 </HTML>
