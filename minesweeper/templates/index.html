@@ -2,15 +2,86 @@
 <HEAD>
 <script type="text/javascript" src="http://jacobodonnell.com/js/jquery-1.4.2.min.js"></script>
 <script>
+
+var rows = {{ rows }};
+var columns = {{ columns }};
+
+var game_over = false;
+
 $(document).ready(function()
 {
-var div = $('<div/>');
+    for (var row = 0; row < rows; row++) {
+        var top = row * 30;
+        for (var column = 0; column < columns; column++) {
+            var id = "row" + row + "column" + column;
+            var left = column * 30;
+
+            var style = "background-color: grey; position:absolute; width: 25px; height: 25px; left:" + left + "px; top:" + top + "px;";
+            $("#game_area").append('<div my_row="'+ row+ '" my_column="'+ column+'" id="' + id + '" style="' + style + '"></div>');
+
+            $('#' + id).mousedown(function(event) {
+//                if (game_over == true)
+//                    return;
+                switch (event.which) {
+                case 1:
+                    if (this.style.backgroundColor == 'yellow')
+                        break;
+                    var _this = this;
+                    $.getJSON('/clear', {'row':this.getAttribute('my_row'), 'column':this.getAttribute('my_column')}, function(data) {
+
+                        if (data.lost == true) {
+                            _this.style.backgroundColor = 'red';
+                            game_over = true;
+                            $('#lost').css('visibility', 'visible');
+                        }
+
+                        if (data.num_surronding_mines) {
+                            _this.innerHTML = data.num_surronding_mines;
+                        }
+                        if (data.clear_area) {
+                            for (var i = 0; i < data.clear_area.length; i++) {
+                                var clear_point = data.clear_area[i];
+                                $('#row' + clear_point[0] + 'column' + clear_point[1]).css('background-color', 'green');
+                            }
+                        }
+
+                    });
+                    break;
+                case 3:
+                    var _this = this;
+                    if (this.innerHTML != '')
+                        break;
+
+                    $.getJSON('/flag', {'row':this.getAttribute('my_row'), 'column':this.getAttribute('my_column')}, function(data) {
+                        if (_this.style.backgroundColor == 'yellow')
+                            _this.style.backgroundColor = 'grey';
+                        else
+                            _this.style.backgroundColor = 'yellow';
+                        if (data.won)
+                            $('#win').css('visibility', 'visible');
+                    });
+                    break;
+                default:
+                    throw 'Your mouse is weird.';
+                }
+            });
+        }
+    }
+
+    $('div').bind("contextmenu", function(e){ return false; })
+
+    $('#reset').mousedown(function(event) {
+        $.getJSON('/reset', function(data) {
+        });
+    });
 
 });
 </script>
 </HEAD>
 <BODY>
-Hi.
-{{papa}}
+    <div id="game_area"></div>
+    <div id="lost" style="position: absolute; top:300px; color:red; visibility:hidden;">You lost!</div>
+    <div id="win" style="position: absolute; top:330px; color:green; visibility:hidden;">You won!</div>
+    <input type="button" id="reset" style="position: absolute; top:350px;" value="Reset">
 </BODY>
 </HTML>

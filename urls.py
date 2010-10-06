@@ -7,6 +7,9 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns('',
     # Example:
                            (r'^$', 'minesweeper.views.index'),
+                           (r'^clear$', 'minesweeper.views.clear'),
+                           (r'^flag$', 'minesweeper.views.flag'),
+                           (r'^reset$', 'minesweeper.views.reset'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),

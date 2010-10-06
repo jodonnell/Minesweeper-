@@ -1,4 +1,5 @@
 from minesweeper.classes.create_board import CreateBoard
+import sys
 
 CLEAR_SPOT = 0
 MINED_SPOT = 1
@@ -22,10 +23,15 @@ class Board:
         return False
 
     def place_flag(self, row, column):
-        if self._flags_left and not self.is_flag_at(row, column):
+        if self.is_flag_at(row, column):
+            self._flags.remove((row, column))
+            self._flags_left += 1
+            return
+
+        if self._flags_left:
             self._flags.append((row, column))
             self._flags_left -= 1
-                               
+
     def flags_left(self):
         return self._flags_left
 
@@ -63,7 +69,7 @@ class Board:
                     self._board[test_row][test_column]
                 except IndexError:
                     continue
-                
+
                 surronding_spots.append((test_row, test_column))
 
         return surronding_spots
