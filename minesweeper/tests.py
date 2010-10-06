@@ -1,6 +1,7 @@
 from django.test import TestCase
 
-from minesweeper.classes.create_board import CreateBoard
+from minesweeper.classes.create_board import CreateBoard, CreateTestBoard
+from minesweeper.classes.board import Board
 
 BOARD_COLUMNS = 8
 BOARD_ROWS = 8
@@ -23,3 +24,21 @@ class CreateBoardTest(TestCase):
                 mines += self.board[row][column]
 
         self.failUnlessEqual(mines, TOTAL_MINES)
+
+class CreateTestBoardTest(TestCase):
+    def test_testing_board(self):
+        create_test_board = CreateTestBoard(BOARD_ROWS, BOARD_COLUMNS, TOTAL_MINES)
+        self.failUnlessEqual(create_test_board.get_board(), self.get_test_board())
+
+    def get_test_board(self):
+        return [[1, 1, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]]
+
+
+class BoardTest(TestCase):
+    def setUp(self):
+        create_test_board = CreateTestBoard(BOARD_ROWS, BOARD_COLUMNS, TOTAL_MINES)
+        self.board = Board(create_test_board.get_board())
+
+    def test_click_mine(self):
+        self.failUnlessEqual(self.board.is_mined(0,0), True, 'There was no mine at 0,0')
