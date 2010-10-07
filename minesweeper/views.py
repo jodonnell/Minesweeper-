@@ -6,7 +6,7 @@ from django import http
 from minesweeper.classes.create_board import CreateBoard
 from minesweeper.classes.board import Board
 
-from pymongo import Connection, DESCENDING
+from pymongo import Connection, DESCENDING, ASCENDING
 
 import cPickle
 import json
@@ -127,7 +127,7 @@ def _create_new_board():
 def view_high_scores(request):
     db = _get_minesweeper_db()
     high_scores_query = db.high_scores.find()
-    high_scores_query.sort('time', DESCENDING)
+    high_scores_query.sort('time', ASCENDING)
 
     return render_to_response('view_high_scores.html', { 'high_scores': high_scores_query })
     

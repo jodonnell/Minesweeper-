@@ -3,6 +3,7 @@
     <script type="text/javascript" src="http://jacobodonnell.com/js/jquery-1.4.2.min.js"></script>
   </HEAD>
   <BODY>
+    The scores will vary slightly from what you saw on the game screen, because these scores are what the server reported.<br/><br/>
     {% for high_score in high_scores %}
     {{ high_score.time }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ high_score.email }}<br>
     {% endfor %}
