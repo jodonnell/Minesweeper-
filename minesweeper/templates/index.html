@@ -36,6 +36,20 @@ $(document).ready(function()
     var LEFT_MOUSE_CLICKED = 1;
     var RIGHT_MOUSE_CLICKED = 3;
 
+    {
+        var interval;
+        function start_new_game() {
+            new_game = false;
+            var date = new Date();
+            time = date.getTime();
+            interval = setInterval("update_clock();", 30);
+        }
+
+        function end_game() {
+            clearInterval(interval);
+        }
+    }
+
     function is_flagged(element) {
         return (element.style.backgroundColor == 'yellow')
     }
@@ -100,20 +114,6 @@ $(document).ready(function()
             $('#win').html('High score!');
     }
 
-    {
-        var interval;
-        function start_new_game() {
-            new_game = false;
-            var date = new Date();
-            time = date.getTime();
-            interval = setInterval("update_clock();", 30);
-        }
-
-        function end_game() {
-            clearInterval(interval);
-        }
-    }
-
     function clear_spot(element) {
         var args = {'row':element.getAttribute('rowNum'), 'column':element.getAttribute('columnNum')};
         $.getJSON('/clear', args, function(data) {
@@ -156,6 +156,26 @@ $(document).ready(function()
         return "row" + row + "column" + column;
     }
 
+    $('div').bind("contextmenu", function(e){ return false; }) // removes right click menu
+
+    $('#reset').mousedown(function(event) {
+        $.getJSON('/reset', function(data) {
+            for (var row = 0; row < rows; row++) {
+                for (var column = 0; column < columns; column++) {
+                    var id = get_square_id(row, column);
+                    unknown($('#' + id)[0]);
+                    end_game();
+                    $('#win').css('visibility', 'hidden');
+                    $('#win').html('You won!');
+                    $('#lost').css('visibility', 'hidden');
+                    num_flags = TOTAL_FLAGS;
+                    game_over = false;
+                }
+            }
+            new_game = true;
+        });
+    });
+
     for (var row = 0; row < rows; row++) {
         var top = row * 30;
         for (var column = 0; column < columns; column++) {
@@ -187,27 +207,6 @@ $(document).ready(function()
             });
         }
     }
-
-    $('div').bind("contextmenu", function(e){ return false; }) // removes right click menu
-
-    $('#reset').mousedown(function(event) {
-        $.getJSON('/reset', function(data) {
-            for (var row = 0; row < rows; row++) {
-                for (var column = 0; column < columns; column++) {
-                    var id = get_square_id(row, column);
-                    unknown($('#' + id)[0]);
-                    end_game();
-                    $('#win').css('visibility', 'hidden');
-                    $('#win').html('You won!');
-                    $('#lost').css('visibility', 'hidden');
-                    num_flags = TOTAL_FLAGS;
-                    game_over = false;
-                }
-            }
-            new_game = true;
-        });
-    });
-
 });
 </script>
 </HEAD>

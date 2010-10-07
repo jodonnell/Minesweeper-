@@ -5,6 +5,7 @@ CLEAR_SPOT = 0
 MINED_SPOT = 1
 
 class Board:
+    "A class that represents the minesweeper board and its current state"
     def __init__(self, board):
         self._board = board.get_board()
         self._flags_left = board.get_num_mines()
@@ -75,7 +76,9 @@ class Board:
         return surronding_spots
 
     def get_clear_area(self, row, column, clear_area):
-        "You should initially pass in [] to clear_area, it will recursively build"
+        """" Returns all the mines surrounding that are clear. 
+        You should initially pass in [] to clear_area, it will recursively build
+        """
         if self.is_flag_at(row, column) > 0:
             return clear_area
 

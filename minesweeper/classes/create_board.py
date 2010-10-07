@@ -1,5 +1,7 @@
 import random
 
+# An object that is responsible for creating a new board data structure and placing the mines
+
 class AbstractBoard:
     def __init__(self):
         raise "Abstract class"
@@ -43,6 +45,7 @@ class CreateBoard(AbstractBoard):
 
 
 class CreateTestBoard(AbstractBoard):
+    "Expects that there will be 10 mines and at least 8 columns"
     def __init__(self, rows, columns, mines):
         self._create_board(rows, columns, mines)
 
