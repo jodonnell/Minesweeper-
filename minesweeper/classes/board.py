@@ -76,6 +76,9 @@ class Board:
 
     def get_clear_area(self, row, column, clear_area):
         "You should initially pass in [] to clear_area, it will recursively build"
+        if self.is_flag_at(row, column) > 0:
+            return clear_area
+
         num_surronding_mines = self.get_num_surronding_mines(row, column)
         clear_area.append((row, column, num_surronding_mines))
 

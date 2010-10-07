@@ -15,6 +15,7 @@
 var rows = {{ rows }};
 var columns = {{ columns }};
 
+var flags = {{ flags|safe }};
 
 var game_over = false;
 
@@ -31,7 +32,8 @@ $(document).ready(function()
         return element.innerHTML != '';
     }
 
-    function unflag(element) {
+    function unknown(element) {
+        element.innerHTML = '';
         element.style.backgroundColor = 'grey';
     }
 
@@ -40,12 +42,12 @@ $(document).ready(function()
     }
 
     function set_safe(row, column) {
-        $('#row' + row + 'column' + column).css('background-color', 'green');
+        $('#' + get_square_id(row, column)).css('background-color', 'green');
     }
 
     function set_danger(row, column, num_mines_surrounding) {
-        $('#row' + row + 'column' + column).css('background-color', 'orange');
-        $('#row' + row + 'column' + column).html(num_mines_surrounding);
+        $('#' + get_square_id(row, column)).css('background-color', 'orange');
+        $('#' + get_square_id(row, column)).html(num_mines_surrounding);
     }
 
     function set_safe_area(clear_area) {
@@ -89,7 +91,7 @@ $(document).ready(function()
         var args = {'row':element.getAttribute('rowNum'), 'column':element.getAttribute('columnNum')};
         $.getJSON('/flag', args, function(data) {
             if (is_flagged(element))
-                unflag(element);
+                unknown(element);
             else
                 flag(element);
 
@@ -98,12 +100,24 @@ $(document).ready(function()
         });
     }
 
+    function get_square_id(row, column) {
+        return "row" + row + "column" + column;
+    }
+
+    function init_old_game() {
+        for (var i = 0; i < flags.length; i++) {
+            var flag_pos = flags[i];
+            var element =  $('#' + get_square_id(flag_pos[0], flag_pos[1]));
+            flag(element[0]);
+        }
+    }
+
     for (var row = 0; row < rows; row++) {
         var top = row * 30;
         for (var column = 0; column < columns; column++) {
             var left = column * 30;
 
-            var id = "row" + row + "column" + column;
+            var id = get_square_id(row, column);
             var style = "left:" + left + "px; top:" + top + "px;";
             $("#game_area").append('<div class="square" rowNum="' + row+ '" columnNum="' + column + '" id="' + id 
                                    + '" style="' + style + '"></div>');
@@ -130,10 +144,18 @@ $(document).ready(function()
         }
     }
 
+    init_old_game();
+
     $('div').bind("contextmenu", function(e){ return false; }) // removes right click menu
 
     $('#reset').mousedown(function(event) {
         $.getJSON('/reset', function(data) {
+            for (var row = 0; row < rows; row++) {
+                for (var column = 0; column < columns; column++) {
+                    var id = get_square_id(row, column);
+                    unknown($('#' + id)[0]);
+                }
+            }
         });
     });
 

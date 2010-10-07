@@ -10,6 +10,7 @@ from pymongo import Connection
 
 import cPickle
 import json
+import datetime
 
 ROWS = 8
 COLUMNS = 8
@@ -32,11 +33,11 @@ def index(request):
     if query is None:
         create_board = CreateBoard(ROWS, COLUMNS, TOTAL_MINES)
         board = Board(create_board)
-        db.minesweeper.insert({"email": email, "board":cPickle.dumps(board)})
+        db.minesweeper.insert({"email": email, "board":cPickle.dumps(board), 'new_game':True})
     else:
         board = cPickle.loads(str(query['board']))
 
-    return render_to_response('index.html', {'board':board, 'rows':ROWS, 'columns':COLUMNS})
+    return render_to_response('index.html', {'board':board, 'rows':ROWS, 'columns':COLUMNS, 'flags':json.dumps(board._flags)})
 
 def clear(request):
     row = int(request.GET['row'])
@@ -61,15 +62,16 @@ def flag(request):
 
     board = _get_board(request.COOKIES['email'])
     board.place_flag(row, column)
-    
+
+    update_row = {"email": email, "board":cPickle.dumps(board)}
     db = connection.minesweeper
-    db.minesweeper.update({"email": email}, {"email": email, "board":cPickle.dumps(board)})
+    query = db.minesweeper.find_one({'email':email})
+    if 'new_game' in query and query['new_game']:
+        update_row['new_game'] = False
+        update_row['time'] = datetime.datetime.now()
+
+    db.minesweeper.update({"email": email}, update_row)
     
-    import sys
-    print >> sys.stderr, "self._flags_left " + str(board._flags_left)
-
-
-
     response = {}
     if board.has_won():
         response = {'won':True}
@@ -81,8 +83,8 @@ def reset(request):
     db = connection.minesweeper
     create_board = CreateBoard(ROWS, COLUMNS, TOTAL_MINES)
     board = Board(create_board)
-    db.minesweeper.update({"email": email}, {"email": email, "board":cPickle.dumps(board)})
-    return http.HttpResponseRedirect('/')
+    db.minesweeper.update({"email": email}, {"email": email, "board":cPickle.dumps(board), 'new_game':True})
+    return http.HttpResponse(json.dumps([]))
 
 def _get_board(email):
     db = connection.minesweeper
