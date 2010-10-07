@@ -49,7 +49,7 @@ class BoardTest(TestCase):
         self.failUnlessEqual(self.board.flags_left(), TOTAL_MINES - 1, 'A flag was not placed')
 
         self.board.place_flag(0,0)
-        self.failUnlessEqual(self.board.flags_left(), TOTAL_MINES - 1, 'A flag was set on top of a flag')
+        self.failUnlessEqual(self.board.flags_left(), TOTAL_MINES, 'Flag was not unclicked')
 
     def test_win(self):
         for column in range(BOARD_COLUMNS - 1):
@@ -73,4 +73,5 @@ class BoardTest(TestCase):
 
     def test_get_clear_area(self):
         clear_area = self.board.get_clear_area(7,7, [])
-        self.failUnlessEqual(len(clear_area), 44)
+        NUM_CLEAR_RETURNED = 53
+        self.failUnlessEqual(len(clear_area), NUM_CLEAR_RETURNED)

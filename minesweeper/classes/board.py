@@ -76,12 +76,22 @@ class Board:
 
     def get_clear_area(self, row, column, clear_area):
         "You should initially pass in [] to clear_area, it will recursively build"
-        if self.get_num_surronding_mines(row, column) > 0:
+        num_surronding_mines = self.get_num_surronding_mines(row, column)
+        clear_area.append((row, column, num_surronding_mines))
+
+        if num_surronding_mines > 0:
             return clear_area
 
-        clear_area.append((row, column))
+
         for point in self._get_surronding_spots(row, column):
-            if point not in clear_area:
+            if not self._already_seen(point, clear_area):
                 clear_area = self.get_clear_area(point[0], point[1], clear_area)
 
         return clear_area
+
+    def _already_seen(self, point, clear_area):
+        for square in clear_area:
+            if (point[0] == square[0]) and (point[1] == square[1]):
+                return True
+        return False
+            

@@ -39,10 +39,22 @@ $(document).ready(function()
         element.style.backgroundColor = 'yellow';
     }
 
-    function set_safe(clear_area) {
+    function set_safe(row, column) {
+        $('#row' + row + 'column' + column).css('background-color', 'green');
+    }
+
+    function set_danger(row, column, num_mines_surrounding) {
+        $('#row' + row + 'column' + column).css('background-color', 'orange');
+        $('#row' + row + 'column' + column).html(num_mines_surrounding);
+    }
+
+    function set_safe_area(clear_area) {
         for (var i = 0; i < clear_area.length; i++) {
             var clear_point = clear_area[i];
-            $('#row' + clear_point[0] + 'column' + clear_point[1]).css('background-color', 'green');
+            if (!clear_point[2])
+                set_safe(clear_point[0], clear_point[1])
+            else
+                set_danger(clear_point[0], clear_point[1], clear_point[2])
         }
     }
 
@@ -64,11 +76,11 @@ $(document).ready(function()
             }
 
             if (data.num_surronding_mines) {
-                element.innerHTML = data.num_surronding_mines;
+                set_danger(element.getAttribute('rowNum'), element.getAttribute('columnNum'), data.num_surronding_mines);
             }
             
             if (data.clear_area) {
-                set_safe(data.clear_area);
+                set_safe_area(data.clear_area);
             }
         });
     }
