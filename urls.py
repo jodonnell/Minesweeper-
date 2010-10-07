@@ -10,6 +10,7 @@ urlpatterns = patterns('',
                            (r'^clear$', 'minesweeper.views.clear'),
                            (r'^flag$', 'minesweeper.views.flag'),
                            (r'^reset$', 'minesweeper.views.reset'),
+                           (r'^high_scores$', 'minesweeper.views.view_high_scores'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),

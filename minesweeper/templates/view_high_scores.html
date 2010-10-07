@@ -1,0 +1,11 @@
+<HTML>
+  <HEAD>
+    <script type="text/javascript" src="http://jacobodonnell.com/js/jquery-1.4.2.min.js"></script>
+  </HEAD>
+  <BODY>
+    {% for high_score in high_scores %}
+    {{ high_score.time }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ high_score.email }}<br>
+    {% endfor %}
+    <a href="/">Home</a>
+  </BODY>
+</HTML>

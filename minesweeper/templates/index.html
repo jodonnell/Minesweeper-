@@ -12,11 +12,11 @@
 
 <script>
 
+var TOTAL_FLAGS = {{ num_flags }};
 var rows = {{ rows }};
 var columns = {{ columns }};
 var num_flags = {{ num_flags }};
 
-var flags = {{ flags|safe }};
 var time;
 var new_game = true;
 
@@ -92,8 +92,12 @@ $(document).ready(function()
         end_game();
     }
 
-    function won() {
+    function won(high_score) {
+        game_over = true;
+        end_game();
         $('#win').css('visibility', 'visible');
+        if (high_score)
+            $('#win').html('High score!');
     }
 
     {
@@ -140,7 +144,7 @@ $(document).ready(function()
                 flag(element);
 
             if (data.won)
-                won();
+                won(data.high_score);
 
             if (new_game){
                 start_new_game();
@@ -150,14 +154,6 @@ $(document).ready(function()
 
     function get_square_id(row, column) {
         return "row" + row + "column" + column;
-    }
-
-    function init_old_game() {
-        for (var i = 0; i < flags.length; i++) {
-            var flag_pos = flags[i];
-            var element =  $('#' + get_square_id(flag_pos[0], flag_pos[1]));
-            flag(element[0]);
-        }
     }
 
     for (var row = 0; row < rows; row++) {
@@ -171,8 +167,8 @@ $(document).ready(function()
                                    + '" style="' + style + '"></div>');
 
             $('#' + id).mousedown(function(event) {
-//                if (game_over == true)
-//                    return;
+                if (game_over == true)
+                    return;
                 switch (event.which) {
                 case LEFT_MOUSE_CLICKED:
                     if (is_flagged(this) || is_clear(this))
@@ -192,8 +188,6 @@ $(document).ready(function()
         }
     }
 
-    init_old_game();
-
     $('div').bind("contextmenu", function(e){ return false; }) // removes right click menu
 
     $('#reset').mousedown(function(event) {
@@ -203,6 +197,11 @@ $(document).ready(function()
                     var id = get_square_id(row, column);
                     unknown($('#' + id)[0]);
                     end_game();
+                    $('#win').css('visibility', 'hidden');
+                    $('#win').html('You won!');
+                    $('#lost').css('visibility', 'hidden');
+                    num_flags = TOTAL_FLAGS;
+                    game_over = false;
                 }
             }
             new_game = true;
@@ -214,8 +213,9 @@ $(document).ready(function()
 </HEAD>
 <BODY>
     <div id="game_area"></div>
-    <div id="flags" style="position: absolute; top:240px; color:purple;"></div>
-    <div id="clock" style="position: absolute; top:270px; color:blue;"></div>
+    <div style="position: absolute; top:240px; left: 500px; color:purple;"><a href="/high_scores">View High Scores</a></div>
+    <div id="flags" style="position: absolute; top:240px; color:purple;">{{num_flags}}</div>
+    <div id="clock" style="position: absolute; top:270px; color:blue;">0</div>
     <div id="lost" style="position: absolute; top:300px; color:red; visibility:hidden;">You lost!</div>
     <div id="win" style="position: absolute; top:330px; color:green; visibility:hidden;">You won!</div>
     <input type="button" id="reset" style="position: absolute; top:350px;" value="Reset">
