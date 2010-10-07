@@ -14,10 +14,22 @@
 
 var rows = {{ rows }};
 var columns = {{ columns }};
+var num_flags = {{ num_flags }};
 
 var flags = {{ flags|safe }};
+var time;
+var new_game = true;
 
 var game_over = false;
+
+function update_clock() {
+    var date = new Date();
+    var now = date.getTime();
+    var time_diff = (now - time) / 1000;
+
+    $('#clock').html(time_diff);
+}
+
 
 $(document).ready(function()
 {
@@ -39,7 +51,20 @@ $(document).ready(function()
 
     function flag(element) {
         element.style.backgroundColor = 'yellow';
+        num_flags--;
+        update_flags();
     }
+
+    function unflag(element) {
+        unknown(element);
+        num_flags++;
+        update_flags();
+    }
+
+    function update_flags() {
+        $('#flags').html(num_flags);
+    }
+
 
     function set_safe(row, column) {
         $('#' + get_square_id(row, column)).css('background-color', 'green');
@@ -64,15 +89,34 @@ $(document).ready(function()
         element.style.backgroundColor = 'red';
         $('#lost').css('visibility', 'visible');
         game_over = true;
+        end_game();
     }
 
     function won() {
         $('#win').css('visibility', 'visible');
     }
 
+    {
+        var interval;
+        function start_new_game() {
+            new_game = false;
+            var date = new Date();
+            time = date.getTime();
+            interval = setInterval("update_clock();", 30);
+        }
+
+        function end_game() {
+            clearInterval(interval);
+        }
+    }
+
     function clear_spot(element) {
         var args = {'row':element.getAttribute('rowNum'), 'column':element.getAttribute('columnNum')};
         $.getJSON('/clear', args, function(data) {
+            if (new_game){
+                start_new_game();
+            }
+
             if (data.lost == true) {
                 lost(element);
             }
@@ -91,12 +135,16 @@ $(document).ready(function()
         var args = {'row':element.getAttribute('rowNum'), 'column':element.getAttribute('columnNum')};
         $.getJSON('/flag', args, function(data) {
             if (is_flagged(element))
-                unknown(element);
+                unflag(element);
             else
                 flag(element);
 
             if (data.won)
                 won();
+
+            if (new_game){
+                start_new_game();
+            }
         });
     }
 
@@ -154,8 +202,10 @@ $(document).ready(function()
                 for (var column = 0; column < columns; column++) {
                     var id = get_square_id(row, column);
                     unknown($('#' + id)[0]);
+                    end_game();
                 }
             }
+            new_game = true;
         });
     });
 
@@ -164,6 +214,8 @@ $(document).ready(function()
 </HEAD>
 <BODY>
     <div id="game_area"></div>
+    <div id="flags" style="position: absolute; top:240px; color:purple;"></div>
+    <div id="clock" style="position: absolute; top:270px; color:blue;"></div>
     <div id="lost" style="position: absolute; top:300px; color:red; visibility:hidden;">You lost!</div>
     <div id="win" style="position: absolute; top:330px; color:green; visibility:hidden;">You won!</div>
     <input type="button" id="reset" style="position: absolute; top:350px;" value="Reset">

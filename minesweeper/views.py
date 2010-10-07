@@ -37,7 +37,7 @@ def index(request):
     else:
         board = cPickle.loads(str(query['board']))
 
-    return render_to_response('index.html', {'board':board, 'rows':ROWS, 'columns':COLUMNS, 'flags':json.dumps(board._flags)})
+    return render_to_response('index.html', {'num_flags':TOTAL_MINES, 'rows':ROWS, 'columns':COLUMNS, 'flags':json.dumps(board._flags)})
 
 def clear(request):
     row = int(request.GET['row'])
