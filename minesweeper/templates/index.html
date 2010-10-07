@@ -1,14 +1,15 @@
 <HTML>
-<HEAD>
-<script type="text/javascript" src="http://jacobodonnell.com/js/jquery-1.4.2.min.js"></script>
-<style>
-.square {
-    width:25px;
-    height: 25px;
-    position:absolute;
-    background-color: grey;
-}
-</style>
+    <HEAD>
+    <TITLE>Minesweeper!</TITLE>
+    <script type="text/javascript" src="http://jacobodonnell.com/js/jquery-1.4.2.min.js"></script>
+    <style>
+    .square {
+        width:25px;
+        height: 25px;
+        position:absolute;
+        background-color: grey;
+    }
+    </style>
 
 <script>
 
@@ -209,14 +210,14 @@ $(document).ready(function()
     }
 });
 </script>
-</HEAD>
-<BODY>
-    <div id="game_area"></div>
-    <div style="position: absolute; top:240px; left: 500px; color:purple;"><a href="/high_scores">View High Scores</a></div>
-    <div id="flags" style="position: absolute; top:240px; color:purple;">{{num_flags}}</div>
-    <div id="clock" style="position: absolute; top:270px; color:blue;">0</div>
-    <div id="lost" style="position: absolute; top:300px; color:red; visibility:hidden;">You lost!</div>
-    <div id="win" style="position: absolute; top:330px; color:green; visibility:hidden;">You won!</div>
-    <input type="button" id="reset" style="position: absolute; top:350px;" value="Reset">
-</BODY>
+    </HEAD>
+    <BODY>
+      <div id="game_area"></div>
+      <div style="position: absolute; top:240px; left: 500px; color:purple;"><a href="/high_scores">View High Scores</a></div>
+      <div id="flags" style="position: absolute; top:240px; color:purple;">{{num_flags}}</div>
+      <div id="clock" style="position: absolute; top:270px; color:blue;">0</div>
+      <div id="lost" style="position: absolute; top:300px; color:red; visibility:hidden;">You lost!</div>
+      <div id="win" style="position: absolute; top:330px; color:green; visibility:hidden;">You won!</div>
+      <input type="button" id="reset" style="position: absolute; top:350px;" value="Reset">
+    </BODY>
 </HTML>
